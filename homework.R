@@ -16,7 +16,9 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 #Use a function to check that your conversion succeeded
 
 #ANSWER
-
+glimpse(ds)
+ds$Year <- as.numeric(ds$Year)
+glimpse(ds)
 
 ### Question 2 ---------- 
 
@@ -24,7 +26,8 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # change ds so that all of the variables are lowercase
 
 #ANSWER
-
+ds <- ds %>% rename_with(tolower)
+glimpse(ds)
 
 ### Question 3 ----------
 
@@ -33,7 +36,14 @@ ds <- read_csv("data_raw/rolling_stone_500.csv")
 # Hint: read the documentation for ?floor and make sure year is numeric (from Question 1)
 
 #ANSWER
+?floor
 
+
+
+ds <- ds %>% mutate(d_year = floor(year/10)) %>%
+  mutate(d_year = d_year*10)
+print(ds)
+glimpse(ds)
 
 ### Question 4 ----------
 

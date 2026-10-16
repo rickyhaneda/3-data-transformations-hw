@@ -38,8 +38,6 @@ glimpse(ds)
 #ANSWER
 ?floor
 
-
-
 ds <- ds %>% mutate(d_year = floor(year/10)) %>%
   mutate(d_year = d_year*10)
 print(ds)
@@ -50,7 +48,8 @@ glimpse(ds)
 # Sort the dataset by rank so that 1 is at the top
 
 #ANSWER
-
+ds <- ds %>% arrange(ds, rank)
+ds
 
 ### Question 5 ----------
 
@@ -59,7 +58,8 @@ glimpse(ds)
 
 #ANSWER
 
-
+top10 <- filter(ds, rank >0, rank <11)
+glimpse(top10)
 
 ### Question 6 ----------
 
@@ -69,6 +69,12 @@ glimpse(ds)
 
 #ANSWER
 
+ds_sum <- drop_na(ds, year)
+ds_sum <- ds %>% summarize(min_year = min(year, na.rm = T),
+                 max_year = max(year, na.rm = T),
+                 m_year = mean(year, na.rm = T))
+ds_sum$m_year <- round(ds_sum$m_year)
+                 
 
 ### Question 7 ----------
 
@@ -79,6 +85,10 @@ glimpse(ds)
 # (this might take some searching to find functions that will help)
 
 #ANSWER
+ds %>% filter(year %in% c(ds_sum$min_year,
+                          ds_sum$max_year,
+                          ds_sum$m_year)) %>% 
+  arrange(year)
 
 
 ### Question 8 ---------- 
@@ -90,7 +100,29 @@ glimpse(ds)
 # find the correct oldest, averag-ist, and most recent songs
 
 #ANSWER
+#correcting the song
+ds <- ds %>% 
+  mutate(year = ifelse(song == "Brass in Pocket", 1979, year))
+ds %>% filter(song == "Brass in Pocket") #this is just me confirming it worked
+#readding decade
+ds <- ds %>% 
+  mutate(d_year = floor(year/10)) %>%
+  mutate(d_year = d_year*10)
+glimpse(ds)
+ds %>% filter(song == "Brass in Pocket") #again checking it's right
+#recalculating min max and mean
+ds_sum <- drop_na(ds, year)
+ds_sum <- ds %>% summarize(min_year = min(year, na.rm = T),
+                           max_year = max(year, na.rm = T),
+                           m_year = mean(year, na.rm = T))
+ds_sum$m_year <- round(ds_sum$m_year)
+glimpse(ds_sum)
 
+#refiltering
+ds %>% filter(year %in% c(ds_sum$min_year,
+                          ds_sum$max_year,
+                          ds_sum$m_year)) %>% 
+  arrange(year)
 
 ### Question 9 ---------
 
@@ -101,7 +133,11 @@ glimpse(ds)
 # Use the pipe %>% to string the commands together
 
 #ANSWER
-
+ds %>% 
+  drop_na(d_year) %>% 
+  group_by(d_year) %>% 
+  summarize(m_rank = mean(rank, na.rm = T),
+            n_songs = n())
 
 ### Question 10 --------
 
@@ -112,7 +148,12 @@ glimpse(ds)
 # Check against your answers from Question 9 to make sure it matches
 
 #ANSWER
-
-
+?count
+ds %>% 
+  drop_na(d_year) %>% 
+  count(d_year) %>%
+  slice_max(n)
 ### Question 11 ------
 # Use RStudio's styler to style all the code in your homework
+install.packages("styler")
+library(styler)
